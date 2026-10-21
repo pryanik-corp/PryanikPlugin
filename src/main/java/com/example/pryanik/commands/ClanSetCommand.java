@@ -1,0 +1,6 @@
+package com.example.pryanik.commands;
+import com.example.pryanik.*;import org.bukkit.Bukkit;import org.bukkit.command.*;import org.bukkit.entity.Player;
+public final class ClanSetCommand implements CommandExecutor {
+ private final PryanikPlugin plugin;public ClanSetCommand(PryanikPlugin p){plugin=p;}
+ public boolean onCommand(CommandSender s,Command c,String l,String[] a){if(!(s instanceof Player p)||!plugin.authed(p.getUniqueId()))return true;if(a.length!=1){p.sendMessage("§e/clanset <ник>");return true;}try{Clan clan=plugin.db().clan(p.getUniqueId());if(clan==null||!clan.leader().equals(p.getUniqueId())){p.sendMessage("§cТолько лидер клана может приглашать.");return true;}Player target=Bukkit.getPlayerExact(a[0]);if(target==null||!plugin.authed(target.getUniqueId())){p.sendMessage("§cИгрок не онлайн или не авторизован.");return true;}if(plugin.db().clan(target.getUniqueId())!=null){p.sendMessage("§cИгрок уже в клане.");return true;}plugin.db().addClanMember(clan.id(),target.getUniqueId());p.sendMessage("§aИгрок добавлен в клан.");target.sendMessage("§aВы добавлены в клан "+clan.name());}catch(Exception e){p.sendMessage("§cНе удалось добавить игрока.");plugin.getLogger().warning("clanset: "+e);}return true;}
+}

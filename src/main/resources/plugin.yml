@@ -1,0 +1,60 @@
+name: PryanikPlugin
+version: 1.0.0
+main: com.example.pryanik.PryanikPlugin
+api-version: '1.20'
+depend: [WorldEdit, WorldGuard]
+softdepend: [Multiverse-Core]
+commands:
+  reg:
+    usage: "/reg <пароль> [повтор]"
+  register:
+    usage: "/register <пароль> [повтор]"
+  l:
+    usage: "/l <пароль>"
+  login:
+    usage: "/login <пароль>"
+  setrank:
+    usage: "/setrank <игрок> <ранг>"
+    permission: pryanik.setrank
+  fly:
+    usage: "/fly [on|off]"
+  van:
+    usage: "/van [on|off]"
+  afk:
+    usage: "/afk"
+  tpa:
+    usage: "/tpa <ник>"
+  tpaap:
+    usage: "/tpaap"
+  tapde:
+    usage: "/tapde"
+  tpablock:
+    usage: "/tpablock <ник>"
+  msg:
+    usage: "/msg <ник> <сообщение>"
+  r:
+    usage: "/r <сообщение>"
+  privat:
+    usage: "/privat <название> | /privat delete <название>"
+  clan:
+    usage: "/clan [create|invite|accept|leave|info|disband]"
+  home:
+    usage: "/home [set]"
+  chome:
+    usage: "/chome [set]"
+  chprivat:
+    usage: "/chprivat <название>"
+  chprivatdelete:
+    usage: "/chprivatdelete <название>"
+  clanset:
+    usage: "/clanset <ник>"
+  world:
+    usage: "/world [list|tp <имя>|create <имя> [normal|nether|end]|create-set <имя>]"
+  report:
+    usage: "/report"
+  code:
+    usage: "/code"
+  mode:
+    usage: "/mode"
+  lobby:
+    usage: "/lobby"

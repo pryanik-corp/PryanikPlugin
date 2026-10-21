@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.example</groupId><artifactId>PryanikPlugin</artifactId><version>1.0.0</version><packaging>jar</packaging>
+  <properties><maven.compiler.release>17</maven.compiler.release><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding></properties>
+  <repositories>
+    <repository><id>papermc</id><url>https://repo.papermc.io/repository/maven-public/</url></repository>
+    <repository><id>enginehub</id><url>https://maven.enginehub.org/repo/</url></repository>
+  </repositories>
+  <dependencies>
+    <dependency><groupId>io.papermc.paper</groupId><artifactId>paper-api</artifactId><version>1.20.4-R0.1-SNAPSHOT</version><scope>provided</scope></dependency>
+    <dependency><groupId>com.zaxxer</groupId><artifactId>HikariCP</artifactId><version>5.1.0</version></dependency>
+    <dependency><groupId>org.postgresql</groupId><artifactId>postgresql</artifactId><version>42.7.3</version></dependency>
+    <dependency><groupId>org.mindrot</groupId><artifactId>jbcrypt</artifactId><version>0.4</version></dependency>
+    <dependency><groupId>com.sk89q.worldguard</groupId><artifactId>worldguard-bukkit</artifactId><version>7.0.9</version><scope>provided</scope></dependency>
+    <dependency><groupId>com.sk89q.worldedit</groupId><artifactId>worldedit-bukkit</artifactId><version>7.2.18</version><scope>provided</scope></dependency>
+  </dependencies>
+  <build><plugins>
+    <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.13.0</version><configuration><release>17</release></configuration></plugin>
+    <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-shade-plugin</artifactId><version>3.5.3</version><executions><execution><phase>package</phase><goals><goal>shade</goal></goals><configuration><createDependencyReducedPom>false</createDependencyReducedPom><relocations>
+      <relocation><pattern>org.postgresql</pattern><shadedPattern>com.example.pryanik.libs.postgresql</shadedPattern></relocation>
+      <relocation><pattern>org.mindrot.jbcrypt</pattern><shadedPattern>com.example.pryanik.libs.bcrypt</shadedPattern></relocation>
+      <relocation><pattern>com.zaxxer.hikari</pattern><shadedPattern>com.example.pryanik.libs.hikari</shadedPattern></relocation>
+    </relocations><transformers><transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/></transformers><filters><filter><artifact>*:*</artifact><excludes><exclude>META-INF/*.SF</exclude><exclude>META-INF/*.RSA</exclude><exclude>META-INF/*.DSA</exclude></excludes></filter></filters></configuration></execution></executions></plugin>
+  </plugins></build>
+</project>

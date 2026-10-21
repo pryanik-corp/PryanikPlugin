@@ -1,0 +1,24 @@
+# Runtime server and world data (never publish)
+/server/
+/plugins/
+/versions/
+/libraries/
+/cache/
+/recovery/
+/db_api/
+
+# Local backups and sensitive config copies
+/backup-*/
+**/runtime-config.yml
+**/latest-safe.log
+
+# Build/editor/Python artifacts
+/target/
+/.idea/
+__pycache__/
+*.py[cod]
+*.log
+
+# Local machine-specific config; keep only src/main/resources/config.yml template
+config.local.yml
+server.properties

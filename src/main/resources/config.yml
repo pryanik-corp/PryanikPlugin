@@ -1,0 +1,5 @@
+database:
+  url: jdbc:postgresql://localhost:5432/DATABASE?sslmode=disable
+  user: postgres
+  password: "SET_YOUR_POSTGRES_PASSWORD_HERE"
+  pool-size: 10
