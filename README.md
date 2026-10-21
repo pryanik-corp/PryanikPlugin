@@ -1,6 +1,6 @@
 # PryanikPlugin — полный обзор проекта
 
-> Релиз v1.0.0: https://github.com/pryanik-corp/PryanikPlugin/releases/tag/v1.0.0
+> Последний релиз: https://github.com/pryanik-corp/PryanikPlugin/releases/latest
 
 ## Кратко о проекте
 
