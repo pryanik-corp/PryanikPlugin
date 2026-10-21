@@ -16,6 +16,7 @@ except ImportError:
 PLUGIN_TABLES = (
     "player_reports",
     "player_activity",
+    "player_homes",
     "clan_invites",
     "clan_members",
     "clans",
@@ -108,6 +109,7 @@ class PlayersViewer(tk.Tk):
         self.refresh_btn = ttk.Button(actions, text="⟳  Подключиться / обновить", command=self.load_players)
         self.refresh_btn.pack(side="left", padx=(0, 7))
         ttk.Button(actions, text="Жалобы", command=self.show_reports).pack(side="left", padx=3)
+        ttk.Button(actions, text="Дома", command=self.show_homes).pack(side="left", padx=3)
         ttk.Button(actions, text="Обзор таблиц", command=self.show_table_overview).pack(side="left", padx=3)
         ttk.Button(actions, text="Удалить игрока", command=self.delete_selected).pack(side="left", padx=3)
         ttk.Button(actions, text="Экспорт игроков CSV", command=self.export_csv).pack(side="left", padx=3)
@@ -240,6 +242,31 @@ class PlayersViewer(tk.Tk):
             ttk.Label(dialog, text=f"Создано таблиц: {len(present)} из {len(PLUGIN_TABLES)}. Отсутствующие будут пропущены при очистке.").pack(anchor="w", padx=14, pady=(0, 12))
         except Exception as exc:
             self._show_error("Не удалось прочитать таблицы", exc)
+
+    def _homes_query(self):
+        with self._connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT p.nickname, p.uuid::text, h.name, h.world_name,
+                           h.x, h.y, h.z, h.yaw, h.pitch
+                    FROM player_homes h
+                    JOIN players p ON p.uuid = h.player_uuid
+                    ORDER BY lower(p.nickname), lower(h.world_name), lower(h.name)
+                """)
+                return cur.fetchall()
+
+    def show_homes(self) -> None:
+        try:
+            rows = self._homes_query()
+        except Exception as exc:
+            self._show_error("Не удалось загрузить личные дома", exc)
+            return
+        self._show_data_window(
+            "Личные дома",
+            ("Игрок", "UUID игрока", "Название", "Мир / гриф", "X", "Y", "Z", "Yaw", "Pitch"),
+            rows,
+            (140, 250, 150, 170, 90, 90, 90, 80, 80),
+        )
 
     def _reports_query(self):
         with self._connection() as conn:

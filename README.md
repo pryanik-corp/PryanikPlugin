@@ -5,7 +5,7 @@
 ## Кратко о проекте
 
 **Название плагина:** PryanikPlugin  
-**Maven-координаты:** `com.example:PryanikPlugin:1.0.0`  
+**Maven-координаты:** `com.example:PryanikPlugin:1.0.2`
 **Главный класс:** `com.example.pryanik.PryanikPlugin`  
 **Платформа:** Paper 1.20.4, Java 17  
 **База:** PostgreSQL через JDBC и HikariCP  
@@ -106,12 +106,12 @@ python players_viewer.py
 mvn clean package
 ```
 
-Ожидаемый результат: `target/PryanikPlugin-1.0.0.jar`. Maven Shade в `pom.xml` включает и переносит пакеты HikariCP, PostgreSQL JDBC и BCrypt в `com.example.pryanik.libs.*`.
+Ожидаемый результат: `target/PryanikPlugin-1.0.2.jar`. Maven Shade в `pom.xml` включает и переносит пакеты HikariCP, PostgreSQL JDBC и BCrypt в `com.example.pryanik.libs.*`.
 
 После сборки обязательно проверяйте JAR, например:
 
 ```powershell
-jar tf target/PryanikPlugin-1.0.0.jar | Select-String 'libs/(hikari/HikariConfig|postgresql/Driver|bcrypt/BCrypt).class'
+jar tf target/PryanikPlugin-1.0.2.jar | Select-String 'libs/(hikari/HikariConfig|postgresql/Driver|bcrypt/BCrypt).class'
 ```
 
 Затем остановите Paper штатной командой, убедитесь, что процесс завершился, скопируйте JAR в `server/plugins/` и запустите сервер один раз. Не меняйте файл плагина, пока Paper держит его загруженным. После старта проверьте свежий `server/logs/latest.log`: успешную активацию PryanikPlugin, подключение Hikari/PostgreSQL и отсутствие `NoClassDefFoundError`, `ClassNotFoundException` и ошибок инициализации.
