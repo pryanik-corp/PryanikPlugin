@@ -5,6 +5,8 @@ api-version: '1.20'
 depend: [WorldEdit, WorldGuard]
 softdepend: [Multiverse-Core]
 commands:
+  auth:
+    usage: "/auth"
   reg:
     usage: "/reg <пароль> [повтор]"
   register:
@@ -35,7 +37,7 @@ commands:
   r:
     usage: "/r <сообщение>"
   privat:
-    usage: "/privat <название> | /privat delete <название>"
+    usage: "/privat"
   clan:
     usage: "/clan [create|invite|accept|leave|info|disband]"
   home:
