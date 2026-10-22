@@ -34,7 +34,7 @@ import org.bukkit.persistence.PersistentDataType;
 /** CSRV binds a portal block to a safe player command. */
 public final class PortalCommand implements CommandExecutor, Listener {
     private static final String TITLE="§8Настройка портала";
-    private static final List<String> OPTIONS=List.of("mode","lobby","kit_start","home","chome");
+    private static final List<String> OPTIONS=List.of("mode","lobby","kit_start","home","chome","rtp");
     private final PryanikPlugin plugin;
     private final NamespacedKey commandKey;
     private final Map<UUID,PendingPortal> pending=new ConcurrentHashMap<>();
@@ -67,6 +67,7 @@ public final class PortalCommand implements CommandExecutor, Listener {
         inv.setItem(13,option(Material.CHEST,"kit_start","§eВыдать стартовый набор"));
         inv.setItem(15,option(Material.RED_BED,"home","§dОткрыть меню домов"));
         inv.setItem(16,option(Material.BEACON,"chome","§6Открыть дом клана"));
+        inv.setItem(20,option(Material.ENDER_EYE,"rtp","§cСлучайная телепортация"));
         inv.setItem(22,option(Material.BARRIER,"__remove","§cУбрать команду с портала"));
         player.openInventory(inv);
     }
