@@ -21,7 +21,7 @@ public final class PvpToggleCommand implements CommandExecutor {
             if (!plugin.gameModes().isModeWorld(player.getWorld()) || scope.equals("legacy") || scope.equals("lobby")) { player.sendMessage("§cНастроить PvP можно только в игровом грифе."); return true; }
             boolean enabled=args[0].equalsIgnoreCase("on");
             plugin.db().setPvpEnabled(scope,enabled);
-            for(org.bukkit.World world:plugin.getServer().getWorlds())if(scope.equals(plugin.gameModes().instanceOf(world.getName())))plugin.setWorldPvpFlag(world,enabled);
+            for(org.bukkit.World world:plugin.getServer().getWorlds())if(scope.equals(plugin.gameModes().instanceOf(world.getName())))plugin.setWorldPvpFlag(world,enabled&&!plugin.gameModes().isSpawnWorld(world));
             player.sendMessage("§aPvP в грифе §e"+scope+" §a"+(enabled?"включено":"выключено")+".");
         } catch (Exception ex) { player.sendMessage("§cНе удалось изменить настройку PvP."); plugin.getLogger().warning("PvP toggle: "+ex); }
         return true;
