@@ -1,5 +1,5 @@
 name: PryanikPlugin
-version: 1.0.4
+version: 1.0.5
 main: com.example.pryanik.PryanikPlugin
 api-version: '1.20'
 depend: [WorldEdit, WorldGuard]
@@ -60,8 +60,12 @@ commands:
     usage: "/mode"
   lobby:
     usage: "/lobby"
-  kti_start:
-    usage: "/kti_start"
+  kit_start:
+    usage: "/kit_start"
+  gm:
+    usage: "/gm <0|1|2>"
+  pvp:
+    usage: "/pvp <on|off>"
 permissions:
   pryanik.setrank:
     default: op

@@ -22,6 +22,7 @@ public final class Database implements AutoCloseable {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS player_homes(player_uuid UUID NOT NULL REFERENCES players(uuid) ON DELETE CASCADE,name VARCHAR(24) NOT NULL,world_name VARCHAR(64) NOT NULL,x DOUBLE PRECISION NOT NULL,y DOUBLE PRECISION NOT NULL,z DOUBLE PRECISION NOT NULL,yaw REAL NOT NULL,pitch REAL NOT NULL,PRIMARY KEY(player_uuid,name))");
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS plugin_player_cooldowns(player_uuid UUID NOT NULL REFERENCES players(uuid) ON DELETE CASCADE,cooldown_key VARCHAR(64) NOT NULL,scope VARCHAR(64) NOT NULL DEFAULT '*',ready_at TIMESTAMP WITH TIME ZONE NOT NULL,PRIMARY KEY(player_uuid,cooldown_key,scope))");
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS plugin_player_rate_limits(id BIGSERIAL PRIMARY KEY,player_uuid UUID NOT NULL REFERENCES players(uuid) ON DELETE CASCADE,limit_key VARCHAR(64) NOT NULL,scope VARCHAR(64) NOT NULL DEFAULT '*',used_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS plugin_world_pvp(scope VARCHAR(64) PRIMARY KEY,enabled BOOLEAN NOT NULL)");
             statement.executeUpdate("CREATE INDEX IF NOT EXISTS plugin_player_rate_limits_lookup ON plugin_player_rate_limits(player_uuid,limit_key,scope,used_at)");
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS plugin_worlds(name VARCHAR(32) PRIMARY KEY,environment VARCHAR(16) NOT NULL)");
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS plugin_world_sets(name VARCHAR(32) PRIMARY KEY,overworld VARCHAR(32) UNIQUE NOT NULL,nether VARCHAR(32) UNIQUE NOT NULL,end_world VARCHAR(32) UNIQUE NOT NULL)");
@@ -52,6 +53,8 @@ public final class Database implements AutoCloseable {
         } catch(SQLException e){throw new IllegalStateException("Cannot initialize PostgreSQL",e);}
     }
     public Connection connection()throws SQLException{return ds.getConnection();}
+    public boolean pvpEnabled(String scope)throws SQLException{try(Connection c=connection();PreparedStatement s=c.prepareStatement("SELECT enabled FROM plugin_world_pvp WHERE scope=?")){s.setString(1,scope);try(ResultSet r=s.executeQuery()){return !r.next()||r.getBoolean(1);}}}
+    public void setPvpEnabled(String scope,boolean enabled)throws SQLException{try(Connection c=connection();PreparedStatement s=c.prepareStatement("INSERT INTO plugin_world_pvp(scope,enabled) VALUES(?,?) ON CONFLICT(scope) DO UPDATE SET enabled=EXCLUDED.enabled")){s.setString(1,scope);s.setBoolean(2,enabled);s.executeUpdate();}}
     public long rateLimitRemaining(UUID player,String key,String scope,int maxUses,long windowMs)throws SQLException {
         String sql="SELECT CASE WHEN count(*)>=? THEN GREATEST(0,CAST(EXTRACT(EPOCH FROM ((MIN(used_at)+(? * INTERVAL '1 millisecond'))-CURRENT_TIMESTAMP))*1000 AS BIGINT)) ELSE 0 END FROM plugin_player_rate_limits WHERE player_uuid=? AND limit_key=? AND scope=? AND used_at>CURRENT_TIMESTAMP-(? * INTERVAL '1 millisecond')";
         try(Connection c=connection();PreparedStatement s=c.prepareStatement(sql)){s.setInt(1,maxUses);s.setLong(2,windowMs);s.setObject(3,player);s.setString(4,key);s.setString(5,scope);s.setLong(6,windowMs);try(ResultSet r=s.executeQuery()){return r.next()?r.getLong(1):0L;}}

@@ -5,7 +5,7 @@
 ## Кратко о проекте
 
 **Название плагина:** PryanikPlugin  
-**Maven-координаты:** `com.example:PryanikPlugin:1.0.4`
+**Maven-координаты:** `com.example:PryanikPlugin:1.0.5`
 **Главный класс:** `com.example.pryanik.PryanikPlugin`  
 **Платформа:** Paper 1.20.4, Java 17  
 **База:** PostgreSQL через JDBC и HikariCP  
@@ -53,7 +53,7 @@ PryanikPlugin/
 
 ### Игровые команды
 
-По метаданным `plugin.yml` плагин объявляет команды: `/fly`, `/van`, `/afk`, `/tpa`, `/tpaap`, `/tapde`, `/tpablock`, `/msg`, `/r`, `/privat`, `/clan`, `/home`, `/chome`, `/chprivat`, `/chprivatdelete`, `/clanset`, `/world`, `/report`, `/code`, `/mode`, `/lobby` и команды регистрации/входа. Точный синтаксис и права смотрите в `plugin.yml` и соответствующих классах `commands/`.
+По метаданным `plugin.yml` плагин объявляет команды: `/fly`, `/van`, `/afk`, `/tpa`, `/tpaap`, `/tapde`, `/tpablock`, `/msg`, `/r`, `/privat`, `/clan`, `/home`, `/chome`, `/chprivat`, `/chprivatdelete`, `/clanset`, `/world`, `/report`, `/code`, `/mode`, `/lobby`, `/kit_start`, `/gm` и `/pvp`, а также команды регистрации/входа. Точный синтаксис и права смотрите в `plugin.yml` и соответствующих классах `commands/`.
 
 ### Приваты и кланы
 
