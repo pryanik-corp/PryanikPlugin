@@ -75,7 +75,7 @@ public final class PortalCommand implements CommandExecutor, Listener {
     private PendingPortal findUnlitFrame(Location location){
         World world=location.getWorld();if(world==null)return null;
         Block origin=location.getBlock();PendingPortal match=null;
-        for(int ox=-4;ox<=4;ox++)for(int oy=-4;oy<=4;oy++)for(int oz=-4;oz<=4;oz++){
+        for(int ox=-16;ox<=16;ox++)for(int oy=-8;oy<=8;oy++)for(int oz=-16;oz<=16;oz++){
             Block base=origin.getRelative(ox,oy,oz);
             for(boolean alongX:new boolean[]{true,false}){
                 PendingPortal candidate=inspectFrame(base,alongX);
@@ -90,8 +90,8 @@ public final class PortalCommand implements CommandExecutor, Listener {
     private PendingPortal inspectFrame(Block base,boolean alongX){
         if(!isFrame(base,2,3,alongX))return null;
         int width=2,height=3;
-        while(width<21&&isFrame(base,width+1,height,alongX))width++;
-        while(height<21&&isFrame(base,width,height+1,alongX))height++;
+        while(width<64&&isFrame(base,width+1,height,alongX))width++;
+        while(height<64&&isFrame(base,width,height+1,alongX))height++;
         int px=alongX?1:0,pz=alongX?0:1;
         for(int x=0;x<width;x++)for(int y=0;y<height;y++){
             Material type=base.getRelative(px*x,y,pz*x).getType();
