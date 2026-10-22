@@ -18,8 +18,10 @@ public final class GameModeToggleCommand implements CommandExecutor {
         if (args.length!=1 || !args[0].matches("[012]")) { player.sendMessage("§eИспользование: /gm <0|1|2>"); return true; }
         try {
             int value=Integer.parseInt(args[0]);
-            if (value==2 && !plugin.db().rank(player.getUniqueId()).canUseVanish()) { player.sendMessage("§cНаблюдатель доступен только HELPER и CSRV."); return true; }
-            if (plugin.gameModes().isLobby(player.getWorld())) { player.sendMessage("§cВ лобби нельзя менять режим игры."); return true; }
+            Rank rank=plugin.db().rank(player.getUniqueId());
+            if(!rank.atLeast(Rank.ADMIN)){player.sendMessage("§cКоманда /gm доступна только ADMIN и выше.");return true;}
+            if (value==2 && !rank.canUseVanish()) { player.sendMessage("§cНаблюдатель доступен только CSRV."); return true; }
+            if (plugin.gameModes().isLobby(player.getWorld()) && !(value==1&&rank==Rank.CSRV)) { player.sendMessage("§cВ лобби только CSRV может использовать /gm 1."); return true; }
             GameMode mode=switch(value){case 0->GameMode.SURVIVAL;case 1->GameMode.CREATIVE;default->GameMode.SPECTATOR;};
             player.setGameMode(mode);
             player.sendMessage("§aРежим игры изменён: §e"+mode.name()+".");
