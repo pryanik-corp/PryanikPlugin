@@ -5,7 +5,7 @@
 ## Кратко о проекте
 
 **Название плагина:** PryanikPlugin  
-**Maven-координаты:** `com.example:PryanikPlugin:1.0.19`
+**Maven-координаты:** `com.example:PryanikPlugin:1.0.20`
 **Главный класс:** `com.example.pryanik.PryanikPlugin`  
 **Платформа:** Paper 1.20.4, Java 17  
 **База:** PostgreSQL через JDBC и HikariCP  
