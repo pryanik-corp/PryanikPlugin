@@ -87,6 +87,9 @@ public final class VillagerCommand implements CommandExecutor, Listener {
         villager.setCustomNameVisible(true);
         villager.setPersistent(true);
         villager.setInvulnerable(true);
+        villager.setGravity(false);
+        villager.setCollidable(false);
+        villager.setAI(false);
         villager.setAware(false);
         villager.getPersistentDataContainer().set(villagerKey, PersistentDataType.BYTE, (byte) 1);
         villager.getPersistentDataContainer().set(actionKey, PersistentDataType.STRING, action);
