@@ -22,3 +22,9 @@ __pycache__/
 # Local machine-specific config; keep only src/main/resources/config.yml template
 config.local.yml
 server.properties
+
+# Private website secrets and dependencies
+.env
+web/.env
+web/.env.local
+web/vendor/
