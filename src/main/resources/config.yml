@@ -9,9 +9,23 @@ admin-worlds:
     block-place: true
     block-break: true
     interact: true
-  # lobby-spawn:
-  #   x: 4.449
-  #   y: -58.0
-  #   z: 21.489
-  #   yaw: 0.0
-  #   pitch: 0.0
+  lobby:
+    spawn:
+      x: 4.449
+      y: -58.0
+      z: 21.489
+      yaw: 0.0
+      pitch: 0.0
+game-modes:
+  survival:
+    enabled: true
+    instances: 20
+    capacity: 20
+  hardcore:
+    enabled: true
+    instances: 5
+    capacity: 15
+  anarchy:
+    enabled: true
+    instances: 15
+    capacity: 15
