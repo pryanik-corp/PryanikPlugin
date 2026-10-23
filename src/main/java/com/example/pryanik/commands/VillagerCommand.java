@@ -1,6 +1,7 @@
 package com.example.pryanik.commands;
 
 import com.example.pryanik.PryanikPlugin;
+import com.example.pryanik.PortalCustomSpawnPermit;
 import com.example.pryanik.Rank;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -80,7 +81,10 @@ public final class VillagerCommand implements CommandExecutor, Listener {
             }
         } catch (Exception ex) { player.closeInventory(); return; }
         player.closeInventory();
-        Villager villager = (Villager) player.getWorld().spawnEntity(player.getLocation(), EntityType.VILLAGER);
+        final Villager[] spawned = new Villager[1];
+        PortalCustomSpawnPermit.run(() -> spawned[0] = (Villager) player.getWorld().spawnEntity(player.getLocation(), EntityType.VILLAGER));
+        Villager villager = spawned[0];
+        if (villager == null) { player.sendMessage("§cНе удалось создать жителя в этом месте."); return; }
         villager.setProfession(Villager.Profession.TOOLSMITH);
         villager.setVillagerLevel(5);
         villager.setCustomName("§6Кузнец");
