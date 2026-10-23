@@ -16,6 +16,13 @@ admin-worlds:
       z: 21.489
       yaw: 0.0
       pitch: 0.0
+admin-api:
+  enabled: false
+  bind: 0.0.0.0
+  port: 8765
+  token: "SET_A_RANDOM_SECRET_AT_LEAST_32_CHARACTERS"
+  allowed-clients:
+    - "192.168.100.10" # IIS website host LAN address
 game-modes:
   survival:
     enabled: true
