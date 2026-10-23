@@ -35,7 +35,7 @@ import org.bukkit.persistence.PersistentDataType;
 public final class PortalCommand implements CommandExecutor, Listener {
     private static final String TITLE="§8Настройка портала";
     private static final List<String> OPTIONS=List.of("mode","lobby","kit_start","home","chome","rtp");
-    private static final int MAX_FRAME_SIZE=64;
+    private static final int MIN_FRAME_WIDTH=2,MAX_FRAME_WIDTH=21,MIN_FRAME_HEIGHT=3,MAX_FRAME_HEIGHT=21;
     private final PryanikPlugin plugin;
     private final NamespacedKey commandKey;
     private final Map<UUID,PendingPortal> pending=new ConcurrentHashMap<>();
@@ -91,9 +91,10 @@ public final class PortalCommand implements CommandExecutor, Listener {
 
     private PendingPortal inspectFrame(Block base,boolean alongX){
         if(!isFrame(base,2,3,alongX))return null;
-        int width=2,height=3;
-        while(width<64&&isFrame(base,width+1,height,alongX))width++;
-        while(height<64&&isFrame(base,width,height+1,alongX))height++;
+        int width=MIN_FRAME_WIDTH,height=MIN_FRAME_HEIGHT;
+        while(width<MAX_FRAME_WIDTH&&isFrame(base,width+1,height,alongX))width++;
+        while(height<MAX_FRAME_HEIGHT&&isFrame(base,width,height+1,alongX))height++;
+        if(width<MIN_FRAME_WIDTH||width>MAX_FRAME_WIDTH||height<MIN_FRAME_HEIGHT||height>MAX_FRAME_HEIGHT)return null;
         int px=alongX?1:0,pz=alongX?0:1;
         for(int x=0;x<width;x++)for(int y=0;y<height;y++){
             Material type=base.getRelative(px*x,y,pz*x).getType();
@@ -116,13 +117,24 @@ public final class PortalCommand implements CommandExecutor, Listener {
             inside.setType(Material.NETHER_PORTAL,false);
             if(inside.getBlockData() instanceof Orientable orientable){orientable.setAxis(frame.alongX()?org.bukkit.Axis.X:org.bukkit.Axis.Z);inside.setBlockData(orientable,false);}
         }
+        // All portal blocks must exist before physics runs; then let Paper recalculate the complete portal shape.
+        for(int x=0;x<frame.width();x++)for(int y=0;y<frame.height();y++){
+            Block inside=base.getRelative(px*x,y,pz*x);
+            inside.setBlockData(inside.getBlockData(),true);
+            if(inside.getType()!=Material.NETHER_PORTAL)return false;
+        }
         return true;
     }
 
     private boolean isFrame(Block base,int width,int height,boolean alongX){
+        if(width<MIN_FRAME_WIDTH||width>MAX_FRAME_WIDTH||height<MIN_FRAME_HEIGHT||height>MAX_FRAME_HEIGHT)return false;
+        int topY=base.getY()+height;
+        if(base.getY()-1<base.getWorld().getMinHeight()||topY>=base.getWorld().getMaxHeight())return false;
         int px=alongX?1:0,pz=alongX?0:1;
         for(int x=-1;x<=width;x++)for(int y=-1;y<=height;y++){
             boolean edge=x==-1||x==width||y==-1||y==height;
+            int blockY=base.getY()+y;
+            if(blockY<base.getWorld().getMinHeight()||blockY>=base.getWorld().getMaxHeight())return false;
             Block b=base.getRelative(px*x,y,pz*x);
             if(edge){if(b.getType()!=Material.OBSIDIAN)return false;}
             else if(b.getType()!=Material.AIR&&b.getType()!=Material.FIRE)return false;
