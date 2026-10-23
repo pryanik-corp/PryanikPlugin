@@ -5,7 +5,9 @@
 ## Кратко о проекте
 
 **Название плагина:** PryanikPlugin  
-**Maven-координаты:** `com.example:PryanikPlugin:1.2.3`
+**Maven-координаты:** `com.example:PryanikPlugin:1.3.0`
+
+Личные дома доступны в анархии через `/home`; дома разделены по миру/грифу. Команды `/home` и `/chome` зарегистрированы плагином. Настройки мира для CSRV: `/ppadmin`; разрешённые команды: `/ppadmin commands <all|none|command,command,...|reset>`. Рестарт делается в панели хостинга; веб-сайт остаётся приватным.
 **Главный класс:** `com.example.pryanik.PryanikPlugin`  
 **Платформа:** Paper 26.3, Java 25
 **Обязательные плагины:** WorldEdit 7.4.6 и WorldGuard 7.0.20

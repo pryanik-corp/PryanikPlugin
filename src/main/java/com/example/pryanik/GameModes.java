@@ -28,7 +28,7 @@ public final class GameModes implements Listener {
  private final NamespacedKey compassKey;
  public void setCompassKey(NamespacedKey key){}
  public GameModes(PryanikPlugin plugin){this.plugin=plugin;this.compassKey=new NamespacedKey(plugin,GameModeCommand.SELECTOR);}
- private Location lobbySpawn(World w){return new Location(w,4.449,-58.0,21.489);}
+ private Location lobbySpawn(World w){String path="admin-worlds.lobby.spawn.";return new Location(w,plugin.getConfig().getDouble(path+"x",plugin.getConfig().getDouble("admin-worlds.lobby-spawn.x",4.449)),plugin.getConfig().getDouble(path+"y",plugin.getConfig().getDouble("admin-worlds.lobby-spawn.y",-58.0)),plugin.getConfig().getDouble(path+"z",plugin.getConfig().getDouble("admin-worlds.lobby-spawn.z",21.489)),(float)plugin.getConfig().getDouble(path+"yaw",0.0),(float)plugin.getConfig().getDouble(path+"pitch",0.0));}
  private boolean isLobbyWorld(World w){return w!=null&&"lobby".equalsIgnoreCase(w.getName());}
  public boolean isLobby(World w){World l=lobby();return w!=null&&l!=null&&w.equals(l);}
  public void configureLobbyWorld(World w){if(!isLobbyWorld(w))return;w.setTime(6000L);w.setStorm(false);w.setThundering(false);w.setGameRule(GameRule.DO_DAYLIGHT_CYCLE,false);w.setGameRule(GameRule.DO_WEATHER_CYCLE,false);w.setGameRule(GameRule.DO_MOB_SPAWNING,false);w.setGameRule(GameRule.DO_PATROL_SPAWNING,false);w.setGameRule(GameRule.DO_TRADER_SPAWNING,false);w.setGameRule(GameRule.DO_INSOMNIA,false);w.setGameRule(GameRule.DO_FIRE_TICK,false);w.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN,true);w.setSpawnLocation(lobbySpawn(w));for(Entity e:w.getEntities())if(e instanceof LivingEntity&&!(e instanceof Player))e.remove();}

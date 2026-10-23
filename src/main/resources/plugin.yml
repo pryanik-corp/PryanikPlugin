@@ -1,5 +1,5 @@
 name: PryanikPlugin
-version: 1.2.3
+version: 1.3.0
 main: com.example.pryanik.PryanikPlugin
 api-version: '26.3'
 depend: [WorldEdit, WorldGuard]
@@ -41,7 +41,7 @@ commands:
   clan:
     usage: "/clan [create|invite|accept|leave|info|disband]"
   home:
-    usage: "/home [set]"
+    usage: "/home [name|set]"
   chome:
     usage: "/chome [set]"
   chprivat:
@@ -72,6 +72,8 @@ commands:
     usage: "/villager"
   rtp:
     usage: "/rtp"
+  ppadmin:
+    usage: "/ppadmin"
 permissions:
   pryanik.setrank:
     default: op
