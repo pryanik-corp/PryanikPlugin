@@ -5,9 +5,10 @@
 ## Кратко о проекте
 
 **Название плагина:** PryanikPlugin  
-**Maven-координаты:** `com.example:PryanikPlugin:1.0.31`
+**Maven-координаты:** `com.example:PryanikPlugin:1.1.0`
 **Главный класс:** `com.example.pryanik.PryanikPlugin`  
-**Платформа:** Paper 1.20.4, Java 17  
+**Платформа:** Paper 26.3, Java 25
+**Обязательные плагины:** WorldEdit 7.4.6 и WorldGuard 7.0.20
 **База:** PostgreSQL через JDBC и HikariCP  
 **Защита регионов:** WorldGuard + WorldEdit (обязательные зависимости)  
 **Multiverse-Core:** дополнительная необязательная зависимость.

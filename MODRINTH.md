@@ -2,11 +2,11 @@
 
 ## Modrinth summary / Краткое описание для Modrinth
 
-A Paper 1.20.4 plugin with lobbies, Survival/Anarchy/Hardcore modes, clans, protected regions, and homes. | Плагин для Paper 1.20.4: лобби, режимы Survival/Anarchy/Hardcore, кланы, приваты и дома.
+A Paper 26.3 plugin with lobbies, Survival/Anarchy/Hardcore modes, clans, protected regions, and homes. | Плагин для Paper 26.3: лобби, режимы Survival/Anarchy/Hardcore, кланы, приваты и дома.
 
 ## English
 
-A Minecraft server plugin for **Paper 1.20.4**, featuring a lobby, game worlds and modes, player authentication, clans, protected regions, and homes.
+A Minecraft server plugin for **Paper 26.3**, featuring a lobby, game worlds and modes, player authentication, clans, protected regions, and homes.
 
 ### Features
 
@@ -25,16 +25,16 @@ A Minecraft server plugin for **Paper 1.20.4**, featuring a lobby, game worlds a
 
 ### Compatibility
 
-- **Minecraft:** 1.20.4
-- **Server:** Paper (Bukkit/Spigot API)
-- **Java:** 17
-- **Required plugins:** [WorldEdit](https://modrinth.com/plugin/worldedit) and [WorldGuard](https://modrinth.com/plugin/worldguard)
+- **Minecraft:** 26.3
+- **Server:** Paper 26.3 (Bukkit/Spigot API)
+- **Java:** 25
+- **Required plugins:** [WorldEdit 7.4.6](https://modrinth.com/plugin/worldedit) and [WorldGuard 7.0.20](https://modrinth.com/plugin/worldguard) or compatible newer versions
 - **PostgreSQL:** a reachable database is required
 - **Multiverse-Core:** optional; only needed for related extra world-management features
 
 ### Installation
 
-1. Install Java 17, Paper 1.20.4, WorldEdit, and WorldGuard.
+1. Install Java 25, Paper 26.3, WorldEdit 7.4.6, and WorldGuard 7.0.20.
 2. Download the JAR from the **Versions** tab and place it in your server's `plugins` folder.
 3. Start the server once to generate `plugins/PryanikPlugin/config.yml`, then stop it.
 4. Configure the PostgreSQL JDBC URL, username, and password. Ensure the Minecraft server can connect to the database and that the database user has permission to create and modify tables.
@@ -62,7 +62,7 @@ Command availability may depend on the current mode, authentication status, and 
 
 ## Русский
 
-Плагин для Minecraft-серверов на **Paper 1.20.4**: лобби, игровые миры и режимы, авторизация, кланы, приваты и дома.
+Плагин для Minecraft-серверов на **Paper 26.3**: лобби, игровые миры и режимы, авторизация, кланы, приваты и дома.
 
 ### Возможности
 
@@ -81,16 +81,16 @@ Command availability may depend on the current mode, authentication status, and 
 
 ### Совместимость
 
-- **Minecraft:** 1.20.4
-- **Сервер:** Paper (Bukkit/Spigot API)
-- **Java:** 17
-- **Обязательные плагины:** [WorldEdit](https://modrinth.com/plugin/worldedit) и [WorldGuard](https://modrinth.com/plugin/worldguard)
+- **Minecraft:** 26.3
+- **Сервер:** Paper 26.3 (Bukkit/Spigot API)
+- **Java:** 25
+- **Обязательные плагины:** WorldEdit 7.4.6 и WorldGuard 7.0.20 или совместимые новые версии
 - **PostgreSQL:** требуется доступная база данных
 - **Multiverse-Core:** необязателен; нужен только для связанных дополнительных функций управления мирами
 
 ### Установка
 
-1. Установите Java 17, Paper 1.20.4, WorldEdit и WorldGuard.
+1. Установите Java 25, Paper 26.3, WorldEdit 7.4.6 и WorldGuard 7.0.20.
 2. Скачайте JAR во вкладке **Versions** и поместите его в папку `plugins` сервера.
 3. Запустите сервер один раз, чтобы создать `plugins/PryanikPlugin/config.yml`, затем остановите его.
 4. Укажите в конфигурации JDBC URL, имя пользователя и пароль PostgreSQL. Убедитесь, что сервер может подключиться к базе, а у пользователя БД есть права на создание и изменение таблиц.
@@ -118,4 +118,4 @@ Command availability may depend on the current mode, authentication status, and 
 
 ## Release / Релиз
 
-Source code and downloadable JAR files / Исходный код и готовые JAR-файлы: [GitHub Releases](https://github.com/pryanik-corp/PryanikPlugin/releases). Current version / Текущая версия: **1.0.31** (local build).
+Source code and downloadable JAR files / Исходный код и готовые JAR-файлы: [GitHub Releases](https://github.com/pryanik-corp/PryanikPlugin/releases). Current release / Текущий релиз: **1.1.0** (Paper 26.3, Java 25).

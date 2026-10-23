@@ -1,7 +1,7 @@
 name: PryanikPlugin
-version: 1.0.31
+version: 1.1.0
 main: com.example.pryanik.PryanikPlugin
-api-version: '1.20'
+api-version: '26.3'
 depend: [WorldEdit, WorldGuard]
 softdepend: [Multiverse-Core]
 commands:
