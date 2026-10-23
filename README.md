@@ -5,7 +5,7 @@
 ## Кратко о проекте
 
 **Название плагина:** PryanikPlugin  
-**Maven-координаты:** `com.example:PryanikPlugin:1.2.0`
+**Maven-координаты:** `com.example:PryanikPlugin:1.2.1`
 **Главный класс:** `com.example.pryanik.PryanikPlugin`  
 **Платформа:** Paper 26.3, Java 25
 **Обязательные плагины:** WorldEdit 7.4.6 и WorldGuard 7.0.20
