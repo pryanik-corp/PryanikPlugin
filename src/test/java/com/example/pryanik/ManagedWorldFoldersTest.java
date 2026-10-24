@@ -1,41 +1,25 @@
 package com.example.pryanik;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/** Lightweight filesystem regression tests; run with assertions enabled. */
+/** Filesystem regression tests for Paper's actual world folder layout. */
 public final class ManagedWorldFoldersTest {
     public static void main(String[] args) throws Exception {
         Path root = Files.createTempDirectory("managed-world-folders-");
-        try {
-            ManagedWorldFolders folders = new ManagedWorldFolders(root);
-            check(folders.managedDataFolder("survival_1").equals(root.resolve("worlds/survival_1/world")), "overworld path");
-            check(folders.managedDataFolder("survival_1_nether").equals(root.resolve("worlds/survival_1/nether")), "nether path");
-            check(folders.managedDataFolder("survival_1_the_end").equals(root.resolve("worlds/survival_1/the_end")), "end path");
-            check(folders.managedDataFolder("survival_1_spawn").equals(root.resolve("worlds/survival_1/spawn")), "spawn path");
-            check(folders.managedDataFolder("lobby").equals(root.resolve("lobby")), "lobby remains in root");
-            Path legacy = root.resolve("survival_3");
-            Files.createDirectories(legacy);
-            Files.writeString(legacy.resolve("level.dat"), "worlddata");
-            folders.prepareWorldFolder("survival_3");
-            check(Files.exists(legacy.resolve("level.dat")), "Bukkit alias reaches migrated world");
-            check(Files.readString(root.resolve("worlds/survival_3/world/level.dat")).equals("worlddata"), "legacy world moved intact");
-            check(folders.hasWorldData("survival_3"), "world recognized after migration");
-            Files.createDirectories(root.resolve("survival_2"));
-            Files.createDirectories(root.resolve("worlds/survival_2/world"));
-            boolean refused = false;
-            try { folders.prepareWorldFolder("survival_2"); } catch (IOException expected) { refused = true; }
-            check(refused, "conflicting folders are not merged");
-            System.out.println("ManagedWorldFoldersTest PASSED");
-        } finally {
-            try (var paths = Files.walk(root)) {
-                for (Path path : paths.sorted(java.util.Comparator.reverseOrder()).toList()) Files.deleteIfExists(path);
-            }
-        }
+        ManagedWorldFolders folders = new ManagedWorldFolders(root);
+        check(folders.worldFolder("survival_1").equals(root.resolve("survival_1")), "overworld root folder");
+        check(folders.worldFolder("survival_1_nether").equals(root.resolve("survival_1_nether")), "nether root folder");
+        check(folders.worldFolder("lobby").equals(root.resolve("lobby")), "lobby root folder");
+        Files.createDirectories(root.resolve("survival_1"));
+        Files.writeString(root.resolve("survival_1/level.dat"), "existing");
+        check(folders.prepareWorldFolder("survival_1").equals(root.resolve("survival_1")), "prepare preserves canonical folder");
+        check(Files.readString(root.resolve("survival_1/level.dat")).equals("existing"), "existing data unchanged");
+        check(!Files.exists(root.resolve("worlds")), "does not create incompatible worlds directory");
+        System.out.println("ManagedWorldFoldersTest PASSED");
     }
 
-    private static void check(boolean ok, String label) {
-        if (!ok) throw new AssertionError(label);
+    private static void check(boolean condition, String description) {
+        if (!condition) throw new AssertionError(description);
     }
 }

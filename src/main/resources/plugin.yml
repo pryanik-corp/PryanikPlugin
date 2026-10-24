@@ -1,5 +1,5 @@
 name: PryanikPlugin
-version: 1.5.4
+version: 1.5.5
 main: com.example.pryanik.PryanikPlugin
 api-version: '26.3'
 depend: [WorldEdit, WorldGuard]
