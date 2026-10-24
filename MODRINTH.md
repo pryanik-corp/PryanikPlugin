@@ -118,4 +118,4 @@ Command availability may depend on the current mode, authentication status, and 
 
 ## Release / Релиз
 
-Source code and downloadable JAR files / Исходный код и готовые JAR-файлы: [GitHub Releases](https://github.com/pryanik-corp/PryanikPlugin/releases). Current release / Текущий релиз: **1.5.6** (Paper 26.3, Java 25).
+Source code and downloadable JAR files / Исходный код и готовые JAR-файлы: [GitHub Releases](https://github.com/pryanik-corp/PryanikPlugin/releases). Current release / Текущий релиз: **1.5.7** (Paper 26.3, Java 25).
