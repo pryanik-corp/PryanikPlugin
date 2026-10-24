@@ -72,6 +72,7 @@ public final class AdminHttpApi {
         String name = f.getOrDefault("name", "");
         String setting = f.getOrDefault("setting", "");
         String value = f.getOrDefault("value", "");
+        if (scope.equals("server")) { if(!setting.equals("load-griefs")&&!setting.equals("save-worlds"))throw new IllegalArgumentException("unsupported_setting");if(setting.equals("save-worlds")){for(World world:Bukkit.getWorlds())world.save();return;}loadRegisteredGriefWorlds();return; }
         if (scope.equals("world")) {
             World w = Bukkit.getWorld(name);
             if (w == null || name.length() > 64 || name.contains("..")) throw new IllegalArgumentException("unknown_world");
@@ -93,6 +94,8 @@ public final class AdminHttpApi {
         } else throw new IllegalArgumentException("invalid_scope");
         plugin.saveConfig();
     }
+
+    private void loadRegisteredGriefWorlds(){try{for(String[] row:plugin.db().gameInstances()){String base=row[2];String[] names={base,base+"_nether",base+"_the_end",base+"_spawn"};World.Environment[] envs={World.Environment.NORMAL,World.Environment.NETHER,World.Environment.THE_END,World.Environment.NORMAL};for(int i=0;i<names.length;i++){java.io.File folder=new java.io.File(Bukkit.getWorldContainer(),names[i]);if(Bukkit.getWorld(names[i])==null&&new java.io.File(folder,"level.dat").isFile()){World world=Bukkit.createWorld(new org.bukkit.WorldCreator(names[i]).environment(envs[i]));if(world!=null)plugin.getLogger().info("Loaded grief world by website request: "+names[i]);}}}plugin.gameModes().refreshIndex();}catch(Exception ex){throw new IllegalArgumentException("load_failed");}}
 
     private org.bukkit.GameMode effectiveGameMode(World world) { String value=plugin.getConfig().getString("admin-worlds."+world.getName()+".game-mode"); if(value!=null)try{return org.bukkit.GameMode.valueOf(value.toUpperCase());}catch(IllegalArgumentException ignored){} if(world.getName().equalsIgnoreCase("lobby")||plugin.gameModes().isSpawnWorld(world))return org.bukkit.GameMode.ADVENTURE; return org.bukkit.GameMode.SURVIVAL; }
 

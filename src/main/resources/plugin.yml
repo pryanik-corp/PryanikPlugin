@@ -1,5 +1,5 @@
 name: PryanikPlugin
-version: 1.6.0
+version: 1.6.1
 main: com.example.pryanik.PryanikPlugin
 api-version: '26.3'
 depend: [WorldEdit, WorldGuard]
@@ -60,6 +60,8 @@ commands:
     usage: "/mode"
   lobby:
     usage: "/lobby"
+  spawn:
+    usage: "/spawn"
   kit_start:
     usage: "/kit_start"
   gm:

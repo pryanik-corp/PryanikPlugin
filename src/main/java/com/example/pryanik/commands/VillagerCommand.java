@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.entity.VillagerReplenishTradeEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -99,6 +100,8 @@ public final class VillagerCommand implements CommandExecutor, Listener {
         villager.getPersistentDataContainer().set(actionKey, PersistentDataType.STRING, action);
         player.sendMessage("§aКузнец создан. При нажатии он выполнит: §e/" + action);
     }
+
+    @EventHandler public void preventVillagerRestock(VillagerReplenishTradeEvent event) { event.setCancelled(true); }
 
     @EventHandler public void clickVillager(PlayerInteractEntityEvent event) {
         if (!(event.getRightClicked() instanceof Villager villager)) return;
