@@ -19,6 +19,7 @@ import org.bukkit.World;
 public final class AdminHttpApi {
     private final PryanikPlugin plugin;
     private HttpServer server;
+    private volatile int[] lastLoadCounts = new int[]{0,0,0,0};
 
     public AdminHttpApi(PryanikPlugin plugin) { this.plugin = plugin; }
 
@@ -58,9 +59,9 @@ public final class AdminHttpApi {
             String body = new String(requestBody, StandardCharsets.UTF_8);
             Map<String,String> fields = parseForm(body);
             final String[] error = new String[1];
-            runSync(() -> { try { apply(fields); } catch (IllegalArgumentException ex) { error[0] = ex.getMessage(); } });
-            if (error[0] != null) { respond(exchange, 400, "{\"error\":\"" + json(error[0]) + "\"}"); return; }
-            respond(exchange, 200, "{\"ok\":true}");
+            runSync(() -> { try { apply(fields); } catch (IllegalArgumentException ex) { error[0] = ex.getMessage(); } }, "load-griefs".equals(fields.get("setting")) ? 120_000L : 5_000L);
+            if (error[0] != null) { int status="no_registered_griefs".equals(error[0])?404:400;respond(exchange,status,"{\"error\":\"" + json(error[0]) + "\"}"); return; }
+            String loadResult=fields.getOrDefault("_load_result","");if(!loadResult.isEmpty()){String[] counts=loadResult.split(",");respond(exchange,200,"{\"ok\":true,\"sets\":"+counts[0]+",\"loaded\":"+counts[1]+",\"alreadyLoaded\":"+counts[2]+",\"missing\":"+counts[3]+"}");}else respond(exchange, 200, "{\"ok\":true}");
         } catch (Exception ex) {
             plugin.getLogger().warning("Admin API request failed: " + ex.getMessage());
             respond(exchange, 500, "{\"error\":\"internal\"}");
@@ -72,7 +73,7 @@ public final class AdminHttpApi {
         String name = f.getOrDefault("name", "");
         String setting = f.getOrDefault("setting", "");
         String value = f.getOrDefault("value", "");
-        if (scope.equals("server")) { if(!setting.equals("load-griefs")&&!setting.equals("save-worlds"))throw new IllegalArgumentException("unsupported_setting");if(setting.equals("save-worlds")){for(World world:Bukkit.getWorlds())world.save();return;}loadRegisteredGriefWorlds();return; }
+        if (scope.equals("server")) { if(!setting.equals("load-griefs")&&!setting.equals("save-worlds"))throw new IllegalArgumentException("unsupported_setting");if(setting.equals("save-worlds")){for(World world:Bukkit.getWorlds())world.save();return;}int[] result=loadRegisteredGriefWorlds();lastLoadCounts=result;f.put("_load_result",result[0]+","+result[1]+","+result[2]+","+result[3]);return; }
         if (scope.equals("world")) {
             World w = Bukkit.getWorld(name);
             if (w == null || name.length() > 64 || name.contains("..")) throw new IllegalArgumentException("unknown_world");
@@ -95,7 +96,7 @@ public final class AdminHttpApi {
         plugin.saveConfig();
     }
 
-    private void loadRegisteredGriefWorlds(){try{for(String[] row:plugin.db().gameInstances()){String base=row[2];String[] names={base,base+"_nether",base+"_the_end",base+"_spawn"};World.Environment[] envs={World.Environment.NORMAL,World.Environment.NETHER,World.Environment.THE_END,World.Environment.NORMAL};for(int i=0;i<names.length;i++){java.io.File folder=new java.io.File(Bukkit.getWorldContainer(),names[i]);if(Bukkit.getWorld(names[i])==null&&new java.io.File(folder,"level.dat").isFile()){World world=Bukkit.createWorld(new org.bukkit.WorldCreator(names[i]).environment(envs[i]));if(world!=null)plugin.getLogger().info("Loaded grief world by website request: "+names[i]);}}}plugin.gameModes().refreshIndex();}catch(Exception ex){throw new IllegalArgumentException("load_failed");}}
+    private int[] loadRegisteredGriefWorlds(){int loaded=0,already=0,missing=0;try{Map<String,String[]> sets=new LinkedHashMap<>();for(String[] set:plugin.db().managedWorldSets())sets.put(set[0],set);for(String[] row:plugin.db().gameInstances()){String base=row[2];sets.putIfAbsent(base,new String[]{base,base,base+"_nether",base+"_the_end",base+"_spawn"});}if(sets.isEmpty())throw new IllegalArgumentException("no_registered_griefs");int setCount=sets.size();for(String[] set:sets.values()){String base=set[0];String[] names={set[1],set[2],set[3],set.length>4&&!set[4].isBlank()?set[4]:base+"_spawn"};World.Environment[] envs={World.Environment.NORMAL,World.Environment.NETHER,World.Environment.THE_END,World.Environment.NORMAL};for(int i=0;i<names.length;i++){if(names[i]==null||names[i].isBlank())continue;if(Bukkit.getWorld(names[i])!=null){already++;continue;}java.io.File folder=new java.io.File(Bukkit.getWorldContainer(),names[i]);if(!new java.io.File(folder,"level.dat").isFile()){missing++;continue;}try{World world=Bukkit.createWorld(new org.bukkit.WorldCreator(names[i]).environment(envs[i]));if(world!=null){loaded++;plugin.getLogger().info("Loaded grief world by website request: "+names[i]);}else missing++;}catch(Exception worldError){missing++;plugin.getLogger().severe("Could not load grief world "+names[i]+": "+worldError);}}}plugin.gameModes().refreshIndex();return new int[]{setCount,loaded,already,missing};}catch(IllegalArgumentException ex){throw ex;}catch(Exception ex){plugin.getLogger().severe("Website load-all grief worlds failed: "+ex);throw new IllegalArgumentException("load_failed");}}
 
     private org.bukkit.GameMode effectiveGameMode(World world) { String value=plugin.getConfig().getString("admin-worlds."+world.getName()+".game-mode"); if(value!=null)try{return org.bukkit.GameMode.valueOf(value.toUpperCase());}catch(IllegalArgumentException ignored){} if(world.getName().equalsIgnoreCase("lobby")||plugin.gameModes().isSpawnWorld(world))return org.bukkit.GameMode.ADVENTURE; return org.bukkit.GameMode.SURVIVAL; }
 
@@ -105,7 +106,8 @@ public final class AdminHttpApi {
         out.append("],\"modes\":{");String[] modes={"survival","hardcore","anarchy"};for(int i=0;i<modes.length;i++){String m=modes[i],p="game-modes."+m+".";if(i>0)out.append(',');out.append('\"').append(m).append("\":{\"enabled\":").append(plugin.getConfig().getBoolean(p+"enabled",true)).append(",\"instances\":").append(plugin.getConfig().getInt(p+"instances",switch(m){case "survival"->20;case "hardcore"->5;default->15;})).append(",\"capacity\":").append(plugin.getConfig().getInt(p+"capacity",m.equals("survival")?20:15)).append('}');}return out.append("}}").toString();
     }
 
-    private void runSync(Runnable runnable) throws InterruptedException { if(Bukkit.isPrimaryThread()){runnable.run();return;}CountDownLatch done=new CountDownLatch(1);Bukkit.getScheduler().runTask(plugin,()->{try{runnable.run();}finally{done.countDown();}});if(!done.await(5,java.util.concurrent.TimeUnit.SECONDS))throw new IllegalStateException("main_thread_timeout"); }
+    private void runSync(Runnable runnable) throws InterruptedException {runSync(runnable,5_000L);}
+    private void runSync(Runnable runnable,long timeoutMs) throws InterruptedException { if(Bukkit.isPrimaryThread()){runnable.run();return;}CountDownLatch done=new CountDownLatch(1);Bukkit.getScheduler().runTask(plugin,()->{try{runnable.run();}finally{done.countDown();}});if(!done.await(timeoutMs,java.util.concurrent.TimeUnit.MILLISECONDS))throw new IllegalStateException("main_thread_timeout"); }
     private static boolean bool(String v){if(v.equalsIgnoreCase("true"))return true;if(v.equalsIgnoreCase("false"))return false;throw new IllegalArgumentException("invalid_boolean");}
     private static int number(String v,int min,int max){try{int n=Integer.parseInt(v);if(n<min||n>max)throw new IllegalArgumentException("out_of_range");return n;}catch(NumberFormatException ex){throw new IllegalArgumentException("invalid_number");}}
     private static Map<String,String> parseForm(String body){Map<String,String> out=new LinkedHashMap<>();for(String part:body.split("&")){int i=part.indexOf('=');if(i<0)continue;out.put(URLDecoder.decode(part.substring(0,i),StandardCharsets.UTF_8),URLDecoder.decode(part.substring(i+1),StandardCharsets.UTF_8));}return out;}
