@@ -19,7 +19,6 @@ import org.bukkit.World;
 public final class AdminHttpApi {
     private final PryanikPlugin plugin;
     private HttpServer server;
-    private volatile int[] lastLoadCounts = new int[]{0,0,0,0};
 
     public AdminHttpApi(PryanikPlugin plugin) { this.plugin = plugin; }
 
@@ -35,6 +34,7 @@ public final class AdminHttpApi {
             int port = Math.max(1024, Math.min(65535, plugin.getConfig().getInt("admin-api.port", 8765)));
             server = HttpServer.create(new InetSocketAddress(bind, port), 16);
             server.createContext("/admin/settings", exchange -> handle(exchange, token));
+            server.createContext("/admin/spawn-map", exchange -> handleSpawnMap(exchange, token));
             server.setExecutor(Executors.newFixedThreadPool(2, task -> { Thread t = new Thread(task, "Pryanik-AdminHttp"); t.setDaemon(true); return t; }));
             server.start();
             plugin.getLogger().info("Private admin HTTP API listening on " + bind + ":" + port + "/admin/settings");
@@ -42,6 +42,8 @@ public final class AdminHttpApi {
     }
 
     public void stop() { if (server != null) { server.stop(1); server = null; } }
+
+    private void handleSpawnMap(HttpExchange exchange,String token)throws IOException{try{String client=exchange.getRemoteAddress().getAddress().getHostAddress();java.util.List<String> clients=plugin.getConfig().getStringList("admin-api.allowed-clients");if(!clients.contains(client)){respond(exchange,403,"{\"error\":\"client_forbidden\"}");return;}if(!constantEquals(token,exchange.getRequestHeaders().getFirst("X-Pryanik-Token"))){respond(exchange,403,"{\"error\":\"forbidden\"}");return;}if(!"POST".equals(exchange.getRequestMethod())){exchange.getResponseHeaders().set("Allow","POST");respond(exchange,405,"{\"error\":\"method\"}");return;}String type=exchange.getRequestHeaders().getFirst("Content-Type");if(type==null||!type.toLowerCase(java.util.Locale.ROOT).startsWith("application/zip")){respond(exchange,415,"{\"error\":\"zip_required\"}");return;}byte[] archive=exchange.getRequestBody().readNBytes(64*1024*1024+1);if(archive.length>64*1024*1024){respond(exchange,413,"{\"error\":\"upload_too_large\"}");return;}final String[][] result=new String[1][];final String[] error=new String[1];runSync(()->{try{result[0]=plugin.spawnMapManager().uploadAndApply(archive);}catch(Exception ex){plugin.getLogger().severe("Spawn map upload failed: "+ex);error[0]=ex.getMessage();}},900_000L);if(error[0]!=null){respond(exchange,400,"{\"error\":\""+json(error[0])+"\"}");return;}respond(exchange,200,"{\"ok\":true,\"worlds\":"+Integer.parseInt(result[0][0]) +",\"files\":"+Integer.parseInt(result[0][1])+",\"backup\":\""+json(result[0][2])+"\"}");}catch(Exception ex){plugin.getLogger().warning("Spawn map API failed: "+ex);respond(exchange,500,"{\"error\":\"internal\"}");}finally{exchange.close();}}
 
     private void handle(HttpExchange exchange, String token) throws IOException {
         try {
@@ -74,7 +76,7 @@ public final class AdminHttpApi {
         String name = f.getOrDefault("name", "");
         String setting = f.getOrDefault("setting", "");
         String value = f.getOrDefault("value", "");
-        if (scope.equals("server")) { if(!setting.equals("load-griefs")&&!setting.equals("save-worlds"))throw new IllegalArgumentException("unsupported_setting");if(setting.equals("save-worlds")){for(World world:Bukkit.getWorlds())world.save();return;}int[] result=createAndLoadAllConfiguredGriefs();lastLoadCounts=result;f.put("_load_result",result[0]+","+result[1]+","+result[2]+","+result[3]);return; }
+        if (scope.equals("server")) { if(!setting.equals("load-griefs")&&!setting.equals("save-worlds"))throw new IllegalArgumentException("unsupported_setting");if(setting.equals("save-worlds")){for(World world:Bukkit.getWorlds())world.save();return;}int[] result=createAndLoadAllConfiguredGriefs();f.put("_load_result",result[0]+","+result[1]+","+result[2]+","+result[3]);return; }
         if (scope.equals("world")) {
             World w = Bukkit.getWorld(name);
             if (w == null || name.length() > 64 || name.contains("..")) throw new IllegalArgumentException("unknown_world");
@@ -96,6 +98,8 @@ public final class AdminHttpApi {
         } else throw new IllegalArgumentException("invalid_scope");
         plugin.saveConfig();
     }
+
+    public int[] createAllConfiguredGriefWorldsForUpload(){if(!Bukkit.isPrimaryThread())throw new IllegalStateException("must_run_on_server_thread");return createAndLoadAllConfiguredGriefs();}
 
     private int[] createAndLoadAllConfiguredGriefs(){int createdSets=0,loaded=0,already=0,errors=0;String[] modes={"survival","hardcore","anarchy"};World.Environment[] envs={World.Environment.NORMAL,World.Environment.NETHER,World.Environment.THE_END,World.Environment.NORMAL};for(String mode:modes){int count=plugin.gameModes().count(mode);for(int number=1;number<=count;number++){String base=mode+"_"+number;String[] names={base,base+"_nether",base+"_the_end",base+"_spawn"};try{for(int i=0;i<names.length;i++){String worldName=names[i];World world=Bukkit.getWorld(worldName);if(world!=null){already++;continue;}java.io.File folder=new java.io.File(Bukkit.getWorldContainer(),worldName);boolean exists=folder.exists();java.io.File level=new java.io.File(folder,"level.dat");if(exists&&!level.isFile()){if(i==3){com.example.pryanik.SpawnTemplate.install(plugin,worldName,folder.toPath());}else throw new java.io.IOException("existing world folder is missing level.dat; refusing to overwrite: "+folder);}if(i==3&&!level.isFile())com.example.pryanik.SpawnTemplate.install(plugin,worldName,folder.toPath());world=Bukkit.createWorld(new org.bukkit.WorldCreator(worldName).environment(envs[i]));if(world==null)throw new java.io.IOException("Paper returned null while creating/loading world");loaded++;plugin.getLogger().info("Created/loaded grief world from website action: "+worldName);}plugin.db().rememberWorldSet(base,names[0],names[1],names[2],names[3]);plugin.db().registerGameInstance(mode,number,base);createdSets++;}catch(Exception ex){errors++;plugin.getLogger().severe("Cannot create/load grief set "+base+": "+ex);}}}plugin.gameModes().refreshIndex();for(World world:Bukkit.getWorlds())if(plugin.gameModes().isSpawnWorld(world))plugin.gameModes().configureSpawnWorld(world);if(createdSets==0&&errors>0)throw new IllegalArgumentException("no_griefs_created");return new int[]{createdSets,loaded,already,errors};}
 
